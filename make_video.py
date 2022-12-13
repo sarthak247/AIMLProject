@@ -2,7 +2,7 @@ import cv2
 import os
 
 image_folder = 'frames_frn/'
-video_name = 'mosaic_with_frn_less_weight.avi'
+video_name = 'udnie_frn.avi'
 
 images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
 images2 = []

@@ -1,1 +1,1 @@
-python train.py --style styles/udnie.jpg --data-dir ./data --gpu-device 0 --epochs 2 --lr 1e-3 --output-file model.pth --frn
+python train.py --data-dir /home/sarthak/Desktop/mnt/pytorch-reconet/data  --style styles/mosaic_2.jpg --gpu-device 0 --epochs 2 --lr 1e-3 --output-file model.pth --frn

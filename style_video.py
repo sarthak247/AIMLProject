@@ -6,7 +6,6 @@ import numpy as np
 
 # from lib import ReCoNetModel
 from model import ReCoNet
-from ffmpeg_tools import VideoReader, VideoWriter
 import torch
 import cv2
 from utils import nhwc_to_nchw, nchw_to_nhwc, postprocess_reconet, preprocess_for_reconet
@@ -30,16 +29,16 @@ if __name__ == "__main__":
     # batch_size = args.batch_size
 
     model = ReCoNet(frn=True)
-    model.load_state_dict(torch.load('models/starry_night_3_frn/model.pth', map_location='cuda:0'))
+    model.load_state_dict(torch.load('models_full/starry_night/model.pth', map_location='cuda:0'))
     model.eval()
     model = model.to(device = 'cuda')
 
 
-    vidcap = cv2.VideoCapture('test.mp4')
+    vidcap = cv2.VideoCapture('videos/test.mp4')
     success,image = vidcap.read()
     height, width, layers = image.shape
     fps = vidcap.get(cv2.CAP_PROP_FPS)
-    output = cv2.VideoWriter('output.avi', 0, 25, (width, height))
+    # output = cv2.VideoWriter('output.avi', 0, 25, (width, height))
     count = 0
     t1 = time.time()
     while success:
@@ -48,6 +47,8 @@ if __name__ == "__main__":
         success, frame = vidcap.read()
         if success:
             orig_ndim = frame.ndim
+            frame = cv2.cvtColor(cv2.UMat(frame), cv2.COLOR_BGR2RGB)
+            frame = cv2.UMat.get(frame)
             frame = frame[None, ...]
             frame = torch.from_numpy(frame)
             frame = frame.to(device = 'cuda')
@@ -64,6 +65,7 @@ if __name__ == "__main__":
                 styled_frame = styled_frame.numpy()
                 if orig_ndim == 3:
                         styled_frame = styled_frame[0]
+                styled_frame = cv2.cvtColor(cv2.UMat(styled_frame), cv2.COLOR_RGB2BGR)
             cv2.imwrite('frames_frn/' + str(count) + '.png', styled_frame)
         # wait 20 milliseconds between frames and break the loop if the `q` key is pressed
         if cv2.waitKey(20) == ord('q'):
@@ -71,7 +73,7 @@ if __name__ == "__main__":
 
 # we also need to close the video and destroy all Windows
     vidcap.release()
-    output.release()
+    # output.release()
     cv2.destroyAllWindows()
     t2 = time.time()
     print(count/((t2-t1)))

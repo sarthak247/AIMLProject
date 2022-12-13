@@ -99,7 +99,7 @@ if __name__ == "__main__":
     parser.add_argument("--gpu-device", type=int, default=0, help="GPU device index")
     parser.add_argument("--alpha", type=float, default=1e4, help="Weight of content loss")
     parser.add_argument("--beta", type=float, default=1e5, help="Weight of style loss")
-    parser.add_argument("--gamma", type=float, default=1e-5, help="Weight of style loss")
+    parser.add_argument("--gamma", type=float, default=1e-5, help="Weight of total variation")
     parser.add_argument("--lambda-f", type=float, default=1e5, help="Weight of feature temporal loss")
     parser.add_argument("--lambda-o", type=float, default=2e5, help="Weight of output temporal loss")
     parser.add_argument("--epochs", type=int, default=2, help="Number of epochs")
@@ -121,8 +121,9 @@ if __name__ == "__main__":
         ])
         monkaa = MonkaaDataset(os.path.join(args.data_dir, "monkaa"), transform)
         # flyingthings3d = FlyingThings3DDataset(os.path.join(args.data_dir, "flyingthings3d"), transform)
-        # dataset = monkaa + flyingthings3d
-        dataset = monkaa
+        flyingthings3d = MonkaaDataset(os.path.join(args.data_dir, "flyingthings3d-2"), transform)
+        dataset = monkaa + flyingthings3d
+        # dataset = monkaa
         batch_size = 4
         traindata = torch.utils.data.DataLoader(dataset,
                                                 batch_size=batch_size,
@@ -143,7 +144,7 @@ if __name__ == "__main__":
             del style, style_vgg_features
 
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
-        writer = SummaryWriter('runs/udnie_frn')
+        writer = SummaryWriter('runs_full/mosaic_frn')
 
         n_epochs = args.epochs
         for epoch in range(n_epochs):
